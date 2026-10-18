@@ -1,0 +1,273 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yoru Anime</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0b0b10;
+  --panel: #15151e;
+  --accent: #a78bfa;
+  --text: #f5f3ff;
+  --muted: #a1a1b5;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px Arial, sans-serif;
+}
+header {
+  padding: 22px 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.logo { font-size: 25px; font-weight: 800; }
+.logo span { color: var(--accent); }
+input, select, button {
+  background: var(--panel);
+  color: white;
+  border: 1px solid #30303c;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+input { width: min(100%, 280px); }
+main { padding: 0 5% 50px; }
+.hero {
+  background: linear-gradient(120deg,#282044,#14131d 70%);
+  border-radius: 20px;
+  padding: 32px 24px;
+  margin-bottom: 30px;
+}
+.hero p, .muted { color: var(--muted); }
+h1 { font-size: clamp(28px, 6vw, 44px); margin: 12px 0; }
+h2 { margin-top: 30px; }
+.filters { display: flex; gap: 10px; flex-wrap: wrap; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+.card {
+  background: var(--panel);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid #242431;
+}
+.card img {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  display: block;
+}
+.card div { padding: 12px; }
+.card h3 { font-size: 15px; margin: 0 0 7px; }
+.card p { color: var(--muted); font-size: 12px; margin: 0; }
+dialog {
+  background: #15151e;
+  color: white;
+  border: 1px solid #393448;
+  border-radius: 18px;
+  width: min(92%, 460px);
+  max-height: 85vh;
+  overflow: auto;
+}
+dialog::backdrop { background: #000c; }
+dialog img { width: 100px; border-radius: 10px; }
+.detail { display: flex; gap: 16px; }
+.detail h2 { margin-top: 0; }
+#episodes { display: grid; gap: 8px; margin-top: 16px; }
+#episodes a {
+  padding: 12px; border-radius: 8px;
+  background: #252333; color: white;
+  text-decoration: none;
+}
+footer {
+  text-align: center; padding: 25px;
+  color: var(--muted);
+}
+@media(min-width:600px) {
+  .grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  main { max-width: 1200px; margin: auto; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">yoru<span>.</span></div>
+  <input id="search" placeholder="Search anime..." aria-label="Search anime">
+</header>
+
+<main>
+<section class="hero">
+  <p>YOUR NEXT OBSESSION STARTS HERE</p>
+  <h1>Enter the anime world.</h1>
+  <p>Discover stories worth staying up for.</p>
+  <button onclick="document.querySelector('#catalogue').scrollIntoView({behavior:'smooth'})">
+    Explore anime
+  </button>
+</section>
+
+<section id="catalogue">
+  <h2>Discover</h2>
+  <div class="filters">
+    <select id="genre" aria-label="Filter by genre">
+      <option value="All">All genres</option>
+      <option>Action</option>
+      <option>Fantasy</option>
+      <option>Adventure</option>
+      <option>Drama</option>
+    </select>
+    <select id="sort" aria-label="Sort anime">
+      <option value="default">Featured</option>
+      <option value="az">Name A-Z</option>
+    </select>
+  </div>
+  <div id="grid" class="grid"></div>
+</section>
+</main>
+
+<dialog id="modal">
+  <div class="detail">
+    <img id="poster" alt="Anime poster">
+    <div>
+      <h2 id="title"></h2>
+      <p id="description" class="muted"></p>
+    </div>
+  </div>
+  <h3>Choose a season</h3>
+  <select id="season"></select>
+  <div id="episodes"></div>
+  <p class="muted">Episode links are examples. Add authorized viewing links before publishing.</p>
+  <button onclick="document.querySelector('#modal').close()">Close</button>
+</dialog>
+
+<footer>yoru. · Discover your next favourite anime.</footer>
+
+<script>
+const anime = [
+  {
+    title: "Attack on Titan",
+    genre: "Action",
+    poster: "https://cdn.myanimelist.net/images/anime/10/47347.jpg",
+    description: "Humanity fights for survival behind enormous walls.",
+    seasons: [
+      {name:"Season 1", count:25},
+      {name:"Season 2", count:12},
+      {name:"Season 3", count:22},
+      {name:"Final Season", count:16}
+    ]
+  },
+  {
+    title: "Demon Slayer",
+    genre: "Action",
+    poster: "https://cdn.myanimelist.net/images/anime/1286/99889.jpg",
+    description: "A young swordsman searches for a cure for his sister.",
+    seasons: [
+      {name:"Season 1", count:26},
+      {name:"Entertainment District Arc", count:11},
+      {name:"Swordsmith Village Arc", count:11},
+      {name:"Hashira Training Arc", count:8}
+    ]
+  },
+  {
+    title: "One Piece",
+    genre: "Adventure",
+    poster: "https://cdn.myanimelist.net/images/anime/6/73245.jpg",
+    description: "A pirate crew journeys across a vast and dangerous sea.",
+    seasons: [{name:"Season 1", count:61}]
+  },
+  {
+    title: "Frieren",
+    genre: "Fantasy",
+    poster: "https://cdn.myanimelist.net/images/anime/1015/138006.jpg",
+    description: "An elf mage reflects on time, friendship and adventure.",
+    seasons: [
+      {name:"Season 1", count:28}
+    ]
+  },
+  {
+    title: "Death Note",
+    genre: "Drama",
+    poster: "https://cdn.myanimelist.net/images/anime/9/9453.jpg",
+    description: "A mysterious notebook sparks a battle of intelligence.",
+    seasons: [{name:"Season 1", count:37}]
+  },
+  {
+    title: "Naruto",
+    genre: "Adventure",
+    poster: "https://cdn.myanimelist.net/images/anime/13/17405.jpg",
+    description: "A young ninja works toward his dream of becoming Hokage.",
+    seasons: [{name:"Season 1", count:220}]
+  }
+];
+
+const grid = document.querySelector("#grid");
+const search = document.querySelector("#search");
+const genre = document.querySelector("#genre");
+const sort = document.querySelector("#sort");
+
+function render() {
+  let list = anime.filter(a =>
+    a.title.toLowerCase().includes(search.value.toLowerCase()) &&
+    (genre.value === "All" || a.genre === genre.value)
+  );
+  if (sort.value === "az")
+    list.sort((a,b) => a.title.localeCompare(b.title));
+
+  grid.innerHTML = list.map(a => `
+    <article class="card" data-title="${a.title}">
+      <img src="${a.poster}" alt="${a.title} poster" loading="lazy">
+      <div><h3>${a.title}</h3><p>${a.genre}</p></div>
+    </article>
+  `).join("") || "<p>No anime found.</p>";
+
+  grid.querySelectorAll(".card").forEach(card => {
+    card.onclick = () => openAnime(
+      anime.find(a => a.title === card.dataset.title)
+    );
+  });
+}
+
+function openAnime(a) {
+  document.querySelector("#poster").src = a.poster;
+  document.querySelector("#title").textContent = a.title;
+  document.querySelector("#description").textContent = a.description;
+
+  const season = document.querySelector("#season");
+  season.innerHTML = a.seasons.map((s,i) =>
+    `<option value="${i}">${s.name}</option>`
+  ).join("");
+
+  function showEpisodes() {
+    const s = a.seasons[Number(season.value)];
+    document.querySelector("#episodes").innerHTML =
+      Array.from({length:s.count}, (_,i) =>
+        `<a href="https://www.crunchyroll.com/" target="_blank" rel="noopener">
+          Episode ${i+1} · ${s.name}
+        </a>`
+      ).join("");
+  }
+
+  season.onchange = showEpisodes;
+  showEpisodes();
+  document.querySelector("#modal").showModal();
+}
+
+search.addEventListener("input", render);
+genre.addEventListener("change", render);
+sort.addEventListener("change", render);
+render();
+</script>
+</body>
+</html>
